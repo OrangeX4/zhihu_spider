@@ -9,9 +9,9 @@ headers = {
 }
 
 
-def zhihu_spider(question_id):
+def zhihu_spider(question_id, num):
     # 当页条数
-    limit = 10
+    limit = 1
     # 偏移量
     offset = 0
     # 知乎问题地址
@@ -46,13 +46,13 @@ def zhihu_spider(question_id):
         print(f'已获取前 {offset +limit} 个回答，当前图片总数为 {pic_num}')
         paging = resp.get('paging')
         # is_end  = True 已到最后一页
-        if paging['is_end']:
+        if paging['is_end'] or (offset + limit) >= num:
             print('爬取完毕')
             break
         offset += limit
 
 
-def zh_download(question_id):
+def zh_download(question_id, num):
     img_info = []
     total = 1
     try:
@@ -62,8 +62,8 @@ def zh_download(question_id):
                 img_info.append(img)
                 total += 1
     except FileNotFoundError as e:
-        zhihu_spider(question_id)
-        zh_download(question_id)
+        zhihu_spider(question_id, num)
+        zh_download(question_id, num)
     print('----------------------  开始下载  ---------------------- 图片总数：%d' % total)
     num = 0
     for i in img_info:
@@ -86,4 +86,5 @@ def zh_download(question_id):
 
 
 if __name__ == '__main__':
-    zh_download(question_id='26037846')
+    # 问题id，爬取的回答条数
+    zh_download(question_id='310564833', num=1)
